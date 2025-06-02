@@ -29,3 +29,7 @@ omopDatasets <- dplyr::tribble(
 )
 
 usethis::use_data(omopDatasets, overwrite = TRUE)
+
+omopDatasetsKey <- "OMOP_DATASETS_FOLDER"
+
+usethis::use_data(omopDatasetsKey, internal = TRUE)
