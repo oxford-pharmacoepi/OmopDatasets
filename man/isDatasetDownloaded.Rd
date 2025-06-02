@@ -18,3 +18,13 @@ Whether the dataset is available or not.
 \description{
 Check if a certain dataset is downloaded.
 }
+\examples{
+\donttest{
+library(OmopDatasets)
+
+isDatasetDownloaded("GiBleed")
+downloadDataset("GiBleed")
+isDatasetDownloaded("GiBleed")
+}
+
+}

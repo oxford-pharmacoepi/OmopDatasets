@@ -2,10 +2,19 @@
 % Please edit documentation in R/utilities.R
 \name{availableDatasets}
 \alias{availableDatasets}
-\title{Title}
+\title{List the available datasets}
 \usage{
 availableDatasets()
 }
+\value{
+A character vector with the available datasets.
+}
 \description{
-Title
+List the available datasets
+}
+\examples{
+library(OmopDatasets)
+
+availableDatasets()
+
 }

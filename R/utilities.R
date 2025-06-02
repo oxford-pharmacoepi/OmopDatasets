@@ -35,6 +35,7 @@
 #' downloadDataset("GiBleed")
 #' isDatasetDownloaded("GiBleed")
 #' }
+#'
 downloadDataset <- function(datasetName = "GiBleed",
                             path = datasetsFolder(),
                             overwrite = FALSE) {
@@ -64,7 +65,7 @@ downloadDataset <- function(datasetName = "GiBleed",
 
   # download dataset
   url <- OmopDatasets::omopDatasets$url[OmopDatasets::omopDatasets$dataset_name == datasetName]
-  download.file(url = url, destfile = datasetFile)
+  utils::download.file(url = url, destfile = datasetFile)
 
   invisible(datasetFile)
 }
@@ -78,21 +79,33 @@ downloadDataset <- function(datasetName = "GiBleed",
 #' @export
 #'
 #' @examples
+#' \donttest{
+#' library(OmopDatasets)
+#'
+#' isDatasetDownloaded("GiBleed")
+#' downloadDataset("GiBleed")
+#' isDatasetDownloaded("GiBleed")
+#' }
+#'
 isDatasetDownloaded <- function(datasetName = "GiBleed",
                                 path = datasetsFolder()) {
   # initial checks
   datasetName <- validateDatasetName(datasetName)
   path <- validatePath(path)
 
-  file.exists(file.path(path, datasetPath, paste0(datasetPath, ".zip")))
+  file.exists(file.path(path, datasetName, paste0(datasetName, ".zip")))
 }
 
-#' Title
+#' List the available datasets
 #'
-#' @return
+#' @return A character vector with the available datasets.
 #' @export
 #'
 #' @examples
+#' library(OmopDatasets)
+#'
+#' availableDatasets()
+#'
 availableDatasets <- function() {
   OmopDatasets::omopDatasets$dataset_name
 }
@@ -104,6 +117,7 @@ availableDatasets <- function() {
 #'
 #' @examples
 #' datasetStatus()
+#'
 datasetStatus <- function() {
   x <- OmopDatasets::omopDatasets |>
     dplyr::select("dataset_name") |>
@@ -111,13 +125,8 @@ datasetStatus <- function() {
       datasetsFolder(), .data$dataset_name, paste0(.data$dataset_name, ".zip")
     )), 1, 0)) |>
     dplyr::arrange(dplyr::desc(.data$exists), .data$dataset_name) |>
-    dplyr::mutate(
-      status = dplyr::if_else(.data$exists == 1, "v", "x"),
-      message = rlang::set_names(list(.data$dataset_name), .data$status)
-    )
-  cli::cli_inform(x$message)
-  x <- x |>
-    dplyr::select("status", "exists", "dataset_name")
+    dplyr::mutate(status = dplyr::if_else(.data$exists == 1, "v", "x"))
+  cli::cli_inform(rlang::set_names(x = x$dataset_name, nm = x$status))
   invisible(x)
 }
 

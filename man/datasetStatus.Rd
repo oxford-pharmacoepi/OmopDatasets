@@ -14,4 +14,5 @@ Check the availability of the OMOP CDM datasets.
 }
 \examples{
 datasetStatus()
+
 }
