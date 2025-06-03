@@ -300,8 +300,10 @@ cdmFromMetadata <- function(path) {
 
   if (identical(metadata$type, "files") & identical(metadata$format, "csv")) {
     tables <- list.files(path = dirname(path), pattern = "\\.csv$", full.names = TRUE) |>
+      rlang::set_names() |>
       purrr::map(\(x) utils::read.csv(file = x))
-    names(tables) <- purrr::map_chr(tables,\(x) substr(basename(x), 1, nchar(basename(x)) - 4))
+    names(tables) <- names(tables) |>
+      purrr::map_chr(\(x) substr(basename(x), 1, nchar(basename(x)) - 4))
     cdm <- omopgenerics::cdmFromTables(
       tables = tables,
       cdmName = metadata$cdmName,
