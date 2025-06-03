@@ -2,3 +2,21 @@ url: https://oxford-pharmacoepi.github.io/OmopDatasets/
 template:
   bootstrap: 5
 
+reference:
+- subtitle: Download an OMOP CDM sample dataset
+- contents:
+  - downloadDataset
+- subtitle: Create a cdm_reference object from an OMOP CDM sample dataset
+- contents:
+  - cdmFromDataset
+  - cdmFromMetadata
+- subtitle: Export an OMOP CDM sample dataset
+- contents:
+  - exportDatasetToDuckdb
+  - exportDatasetToFiles
+- subtitle: Utility functions to know the status of the packages
+- contents:
+  - availableDatasets
+  - isDatasetDownloaded
+  - datasetStatus
+  - datasetsFolder
