@@ -19,7 +19,7 @@ Check or set the datasets Folder
 \examples{
 \donttest{
 datasetsFolder()
-datasetsFolder(file.path(tempdir() "OMOP_DATASETS"))
+datasetsFolder(file.path(tempdir(), "OMOP_DATASETS"))
 datasetsFolder()
 }
 
