@@ -10,6 +10,8 @@
 #'   \item{url}{url to download the dataset.}
 #'   \item{cdm_name}{Name of the cdm reference created.}
 #'   \item{cdm_version}{OMOP CDM version of the dataset.}
+#'   \item{size}{Size in bytes of the dataset.}
+#'   \item{size_mb}{Size in Mega bytes of the dataset.}
 #' }
 #'
 #' @examples
