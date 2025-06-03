@@ -104,6 +104,7 @@ exportDatasetToFiles <- function(path,
   vr <- OmopDatasets::omopDatasets$cdm_version[OmopDatasets::omopDatasets$dataset_name == datasetName]
   metadata <- list(
     datasetName = datasetName,
+    type = "files",
     format = format,
     cdmName = nm,
     cdmVersion = vr
@@ -206,7 +207,7 @@ exportDatasetToDuckdb <- function(path,
   vr <- OmopDatasets::omopDatasets$cdm_version[OmopDatasets::omopDatasets$dataset_name == datasetName]
   metadata <- list(
     datasetName = datasetName,
-    format = "database",
+    type = "database",
     dbDir = dbPath,
     dbms = "duckdb",
     cdmName = nm,
@@ -297,12 +298,7 @@ cdmFromMetadata <- function(path) {
   }
   metadata <- readMetadata(path)
 
-  if (!"format" %in% names(metadata)) {
-    cli::cli_abort(c(x = "`METADATA` file is not properly formated."))
-  }
-  omopgenerics::assertChoice(metadata$format, c("csv", "database"))
-
-  if (metadata$format == "csv") {
+  if (identical(metadata$type, "files") & identical(metadata$format, "csv")) {
     tables <- list.files(path = dirname(path), pattern = "\\.csv$", full.names = TRUE) |>
       purrr::map(\(x) utils::read.csv(file = x))
     names(tables) <- purrr::map_chr(tables,\(x) substr(basename(x), 1, nchar(basename(x)) - 4))
@@ -311,7 +307,7 @@ cdmFromMetadata <- function(path) {
       cdmName = metadata$cdmName,
       cdmVersion = metadata$cdmVersion
     )
-  } else if (metadata$format == "database" & metadata$dbms == "duckdb") {
+  } else if (identical(metadata$type, "database") & identical(metadata$dbms, "duckdb")) {
     rlang::check_installed("duckdb")
     rlang::check_installed("CDMConnector")
     con <- duckdb::dbConnect(drv = duckdb::duckdb(dbdir = metadata$dbDir))
@@ -325,6 +321,8 @@ cdmFromMetadata <- function(path) {
       cdmName = metadata$cdmName,
       writePrefix = wp
     )
+  } else {
+    cli::cli_abort(c(x = "`METADATA` file is not properly formated."))
   }
 
   return(cdm)

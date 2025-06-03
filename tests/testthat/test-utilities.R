@@ -2,7 +2,7 @@ test_that("test utility functions", {
   # availableDatasets
   expect_identical(availableDatasets(), OmopDatasets::omopDatasets$dataset_name)
 
-  expect_message(datasetsFolder())
+  expect_no_error(datasetsFolder())
   myFolder <- file.path(tempdir(), "DATASETS")
   expect_message(expect_no_error(datasetsFolder(myFolder)))
   expect_identical(datasetsFolder(), myFolder)

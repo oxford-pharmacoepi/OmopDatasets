@@ -146,7 +146,7 @@ datasetStatus <- function() {
 #' @examples
 #' \donttest{
 #' datasetsFolder()
-#' datasetsFolder(file.path(getwd(), "OMOP_DATASETS"))
+#' datasetsFolder(file.path(tempdir() "OMOP_DATASETS"))
 #' datasetsFolder()
 #' }
 #'
