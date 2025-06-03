@@ -16,6 +16,7 @@ reference:
   - exportDatasetToFiles
 - subtitle: Utility functions to know the status of the packages
 - contents:
+  - omopDatasets
   - availableDatasets
   - isDatasetDownloaded
   - datasetStatus

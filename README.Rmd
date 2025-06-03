@@ -17,9 +17,10 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/oxford-pharmacoepi/OmopDatasets/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/oxford-pharmacoepi/OmopDatasets/actions/workflows/R-CMD-check.yaml)
+[![CRAN status](https://www.r-pkg.org/badges/version/OmopDatasets)](https://CRAN.R-project.org/package=OmopDatasets)
 <!-- badges: end -->
 
-The goal of OmopDatasets is to ...
+The goal of OmopDatasets is an R packages that allowa you to **download**, **export** and **connect** to synthetic sample datasets mapped to the Observational Medical Outcomes Partnership (OMOP) Common Data Model (CDM).
 
 ## Installation
 
@@ -29,7 +30,7 @@ You can install `OmopDatasets` from cran:
 install.packages("OmopDatasets")
 ```
 
-You can install the development version of `OmopDatasets` from [GitHub](https://github.com/oxford-pharmacoepi/OmopDatasets) with:
+Or you can install the development version of `OmopDatasets` from [GitHub](https://github.com/oxford-pharmacoepi/OmopDatasets) with:
 
 ```{r, eval=FALSE}
 # install.packages("pak")
@@ -42,30 +43,38 @@ This is a simple example how to start working with one of our synthetic OMOP CDM
 
 1. Choose the dataset you want to use from the list of `availableDatasets()`:
 
-```{r, eval=FALSE}
+```{r}
+library(OmopDatasets)
 availableDatasets()
 ```
 
 2. Download the dataset that you are interested on:
 
-```{r, eval=FALSE}
+```{r}
 downloadDataset(datasetName = "GiBleed")
 ```
 
-### cdm_reference object
-
 3. Get your cdm_reference object (see [omopgenerics](https://darwin-eu.github.io/omopgenerics/)) from the dataset:
 
-```{r, eval=FALSE}
+```{r}
 cdm <- cdmFromDataset(datasetName = "GiBleed")
 cdm
 ```
 
-### connectionDetails
+This function creates a *temporary* cdm_reference, if you want to export the database to a duckdb container you can use instead:
 
-3. Get you connectionDetails object (see [DatabaseConenctor](https://ohdsi.github.io/DatabaseConnector/)) from the dataset:
+```{r}
+pathToExport <- file.path(tempdir(), "my_db")
+dir.create(pathToExport)
+exportDatasetToDuckdb(path = pathToExport, datasetName = "GiBleed")
+```
 
-```{r, eval=FALSE}
-connectionDetails <- connectionDetailsFromDataset(datasetName = "GiBleed")
-connectionDetails
+You can then create a cdm_reference object using [CDMConnector](https://darwin-eu.github.io/CDMConnector/):
+
+```{r}
+library(duckdb)
+library(CDMConnector)
+
+con <- dbConnect(drv = duckdb(dbdir = file.path(pathToExport, "GiBleed.duckdb")))
+cdm <- cdmFromCon(con = con, cdmSchema = "main", writeSchema = "results")
 ```
