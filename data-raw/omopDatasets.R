@@ -28,8 +28,16 @@ omopDatasets <- dplyr::tribble(
   "empty_cdm", "https://example-data.ohdsi.dev/empty_cdm.zip", "empty_cdm", "5.3"
 )
 
+# get size
+omopDatasets <- omopDatasets |>
+  dplyr::rowwise() |>
+  dplyr::mutate(size = as.numeric(httr::headers(httr::HEAD(.data$url))[["content-length"]])) |>
+  dplyr::ungroup() |>
+  dplyr::mutate(size_mb = round(.data$size / 1024 / 1024)) |>
+  dplyr::arrange(.data$dataset_name)
+
 usethis::use_data(omopDatasets, overwrite = TRUE)
 
 omopDatasetsKey <- "OMOP_DATASETS_FOLDER"
 
-usethis::use_data(omopDatasetsKey, internal = TRUE)
+usethis::use_data(omopDatasetsKey, internal = TRUE, overwrite = TRUE)

@@ -4,9 +4,9 @@
 \name{OmopDatasets-package}
 \alias{OmopDatasets}
 \alias{OmopDatasets-package}
-\title{OmopDatasets: What the Package Does (One Line, Title Case)}
+\title{OmopDatasets: Dataset Manager for OMOP Common Data Model Sample Datasets}
 \description{
-What the package does (one paragraph).
+Download, export and edit synthetic sample datasets mapped to the Observational Medical Outcomes Partnership (OMOP) Common Data Model (CDM).
 }
 \seealso{
 Useful links:
