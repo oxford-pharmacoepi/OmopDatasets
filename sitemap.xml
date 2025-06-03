@@ -9,6 +9,8 @@
 <url><loc>https://oxford-pharmacoepi.github.io/OmopDatasets/reference/datasetStatus.html</loc></url>
 <url><loc>https://oxford-pharmacoepi.github.io/OmopDatasets/reference/datasetsFolder.html</loc></url>
 <url><loc>https://oxford-pharmacoepi.github.io/OmopDatasets/reference/downloadDataset.html</loc></url>
+<url><loc>https://oxford-pharmacoepi.github.io/OmopDatasets/reference/exportDatasetToDuckdb.html</loc></url>
+<url><loc>https://oxford-pharmacoepi.github.io/OmopDatasets/reference/exportDatasetToFiles.html</loc></url>
 <url><loc>https://oxford-pharmacoepi.github.io/OmopDatasets/reference/index.html</loc></url>
 <url><loc>https://oxford-pharmacoepi.github.io/OmopDatasets/reference/isDatasetDownloaded.html</loc></url>
 <url><loc>https://oxford-pharmacoepi.github.io/OmopDatasets/reference/omopDatasets.html</loc></url>
