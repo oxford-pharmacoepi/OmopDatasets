@@ -2,13 +2,29 @@
 % Please edit documentation in R/export.R
 \name{cdmFromMetadata}
 \alias{cdmFromMetadata}
-\title{Title}
+\title{Create a cdm_reference object from a METADATA file.}
 \usage{
 cdmFromMetadata(path)
 }
 \arguments{
-\item{path}{}
+\item{path}{Path to the METADATA file or folder.}
+}
+\value{
+A cdm_reference object.
 }
 \description{
-Title
+Create a cdm_reference object from a METADATA file.
+}
+\examples{
+library(OmopDatasets)
+
+datasetsFolder(tempdir())
+downloadDataset(datasetName = "GiBleed")
+pathToExport <- file.path(tempdir(), "myDatabase")
+dir.create(pathToExport)
+exportDatasetToDuckdb(path = pathToExport, datasetName = "GiBleed")
+
+cdm <- cdmFromMetadata(path = pathToExport)
+cdm
+
 }

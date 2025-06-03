@@ -2,13 +2,37 @@
 % Please edit documentation in R/export.R
 \name{exportDatasetToFiles}
 \alias{exportDatasetToFiles}
-\title{Export a dataset}
+\title{Export a dataset to files}
 \usage{
 exportDatasetToFiles(path, datasetName = "GiBleed", format = "csv")
 }
 \arguments{
-\item{format}{}
+\item{path}{Path to export the files to.}
+
+\item{datasetName}{Name of the dataset. See \code{availableDatasets()} for
+possibilities.}
+
+\item{format}{Either 'csv' or 'parquet'.}
+}
+\value{
+The list of created files.
 }
 \description{
-Export a dataset
+Export a dataset to files
+}
+\examples{
+library(OmopDatasets)
+
+datasetsFolder(tempdir())
+downloadDataset(datasetName = "GiBleed")
+pathToExport <- file.path(tempdir(), "myDatabase")
+dir.create(pathToExport)
+
+exportDatasetToFiles(
+  path = pathToExport,
+  datasetName = "GiBleed",
+  format = "csv"
+)
+list.files(pathToExport)
+
 }

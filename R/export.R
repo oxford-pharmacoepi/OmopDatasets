@@ -1,16 +1,24 @@
 
-#' Title
+#' Create a `duckdb` cdm_reference from a dataset.
 #'
-#' @param datasetName
-#' @param cdmSchema
-#' @param cdmPrefix
-#' @param writeSchema
-#' @param writePrefix
+#' Note these are temporal cdm objects that won't be accessible after
+#' disconnecting, if you want to create a duckdb database use
+#' `exportDatasetToDuckdb()`.
 #'
-#' @return
+#' @inheritParams datasetNameDoc
+#' @inheritParams schemasDoc
+#'
+#' @return A cdm_reference object.
 #' @export
 #'
 #' @examples
+#' library(OmopDatasets)
+#'
+#' datasetsFolder(tempdir())
+#' downloadDataset(datasetName = "GiBleed")
+#' cdm <- cdmFromDataset(datasetName = "GiBleed")
+#' cdm
+#'
 cdmFromDataset <- function(datasetName = "GiBleed",
                            cdmSchema = "main",
                            cdmPrefix = "",
@@ -56,16 +64,30 @@ cdmFromDataset <- function(datasetName = "GiBleed",
   )
 }
 
-#' Export a dataset
+#' Export a dataset to files
 #'
-#' @param path
-#' @param datasetName
-#' @param format
+#' @param path Path to export the files to.
+#' @inheritParams datasetNameDoc
+#' @param format Either 'csv' or 'parquet'.
 #'
-#' @return
+#' @return The list of created files.
 #' @export
 #'
 #' @examples
+#' library(OmopDatasets)
+#'
+#' datasetsFolder(tempdir())
+#' downloadDataset(datasetName = "GiBleed")
+#' pathToExport <- file.path(tempdir(), "myDatabase")
+#' dir.create(pathToExport)
+#'
+#' exportDatasetToFiles(
+#'   path = pathToExport,
+#'   datasetName = "GiBleed",
+#'   format = "csv"
+#' )
+#' list.files(pathToExport)
+#'
 exportDatasetToFiles <- function(path,
                                  datasetName = "GiBleed",
                                  format = "csv") {
@@ -79,7 +101,7 @@ exportDatasetToFiles <- function(path,
 
   # metadata
   nm <- OmopDatasets::omopDatasets$cdm_name[OmopDatasets::omopDatasets$dataset_name == datasetName]
-  vr <- OmopDatasets::omopDatasets$cdm_versionwrite[OmopDatasets::omopDatasets$dataset_name == datasetName]
+  vr <- OmopDatasets::omopDatasets$cdm_version[OmopDatasets::omopDatasets$dataset_name == datasetName]
   metadata <- list(
     datasetName = datasetName,
     format = format,
@@ -125,7 +147,7 @@ exportDatasetToFiles <- function(path,
           x <- DBI::dbGetQuery(con, glue::glue("SELECT * FROM '{x}'")) |>
             dplyr::collect()
         }
-        write.csv(x = x, file = csvFile, row.names = FALSE)
+        utils::write.csv(x = x, file = csvFile, row.names = FALSE)
         csvFile
       }) |>
       purrr::flatten_chr()
@@ -135,19 +157,30 @@ exportDatasetToFiles <- function(path,
   invisible(c(metadataFile, csvFiles))
 }
 
-#' Title
+#' Export a dataset to a duckdb database
 #'
-#' @param path
-#' @param datasetName
-#' @param cdmSchema
-#' @param cdmPrefix
-#' @param writeSchema
-#' @param writePrefix
+#' This will create a permanent duckdb database where you can work locally and
+#' connect and disconnect using `CDMConnector`.
 #'
-#' @return
+#' @param path Path to export the dataset and create the duckdb database.
+#' @inheritParams datasetNameDoc
+#' @inheritParams schemasDoc
+#'
+#' @return The path of the created files.
 #' @export
 #'
 #' @examples
+#' library(OmopDatasets)
+#'
+#' datasetsFolder(tempdir())
+#' downloadDataset(datasetName = "GiBleed")
+#'
+#' pathToExport <- file.path(tempdir(), "myDatabase")
+#' dir.create(pathToExport)
+#'
+#' exportDatasetToDuckdb(path = pathToExport, datasetName = "GiBleed")
+#' list.files(pathToExport)
+#'
 exportDatasetToDuckdb <- function(path,
                                   datasetName = "GiBleed",
                                   cdmSchema = "main",
@@ -232,21 +265,32 @@ createSchema <- function(con, schema) {
   invisible(con)
 }
 
-#' Title
+#' Create a cdm_reference object from a METADATA file.
 #'
-#' @param path
+#' @param path Path to the METADATA file or folder.
 #'
-#' @return
+#' @return A cdm_reference object.
 #' @export
 #'
 #' @examples
+#' library(OmopDatasets)
+#'
+#' datasetsFolder(tempdir())
+#' downloadDataset(datasetName = "GiBleed")
+#' pathToExport <- file.path(tempdir(), "myDatabase")
+#' dir.create(pathToExport)
+#' exportDatasetToDuckdb(path = pathToExport, datasetName = "GiBleed")
+#'
+#' cdm <- cdmFromMetadata(path = pathToExport)
+#' cdm
+#'
 cdmFromMetadata <- function(path) {
   # initial checks
   path <- validatePath(path)
 
   # read metadata
-  if (endsWith(x = path, suffix = "DESCRIPTION")) {
-    path <- file.path(path, "DESCRIPTION")
+  if (!endsWith(x = path, suffix = "METADATA")) {
+    path <- file.path(path, "METADATA")
   }
   if (!file.exists(path)) {
     cli::cli_abort(c(x = "`METADATA` file does not exist in {.path {path}}"))
@@ -256,18 +300,18 @@ cdmFromMetadata <- function(path) {
   if (!"format" %in% names(metadata)) {
     cli::cli_abort(c(x = "`METADATA` file is not properly formated."))
   }
-  omopgenerics::assertChoice(metadata$format, c("csv", "duckdb"))
+  omopgenerics::assertChoice(metadata$format, c("csv", "database"))
 
   if (metadata$format == "csv") {
     tables <- list.files(path = dirname(path), pattern = "\\.csv$", full.names = TRUE) |>
-      purrr::map(\(x) read.csv(file = x))
+      purrr::map(\(x) utils::read.csv(file = x))
     names(tables) <- purrr::map_chr(tables,\(x) substr(basename(x), 1, nchar(basename(x)) - 4))
     cdm <- omopgenerics::cdmFromTables(
       tables = tables,
       cdmName = metadata$cdmName,
       cdmVersion = metadata$cdmVersion
     )
-  } else if (metadata$format == "duckdb") {
+  } else if (metadata$format == "database" & metadata$dbms == "duckdb") {
     rlang::check_installed("duckdb")
     rlang::check_installed("CDMConnector")
     con <- duckdb::dbConnect(drv = duckdb::duckdb(dbdir = metadata$dbDir))

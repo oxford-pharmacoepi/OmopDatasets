@@ -1,10 +1,13 @@
 Package: OmopDatasets
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Dataset Manager for OMOP Common Data Model Sample Datasets
+Version: 0.1.0
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    person(
+        "Martí", "Català", email = "marti.catalasabate@ndorms.ox.ac.uk", 
+        role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3308-9905")
+    )
+Description: Download, export and edit synthetic sample datasets mapped to the 
+    Observational Medical Outcomes Partnership (OMOP) Common Data Model (CDM).
 License: Apache License (>= 2)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -16,8 +19,12 @@ LazyData: true
 Imports: 
     cli,
     dplyr,
+    glue,
     omopgenerics,
+    purrr,
     rlang
 Suggests: 
+    arrow,
+    CDMConnector,
     DBI,
     duckdb

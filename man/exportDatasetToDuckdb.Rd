@@ -2,7 +2,7 @@
 % Please edit documentation in R/export.R
 \name{exportDatasetToDuckdb}
 \alias{exportDatasetToDuckdb}
-\title{Title}
+\title{Export a dataset to a duckdb database}
 \usage{
 exportDatasetToDuckdb(
   path,
@@ -14,8 +14,36 @@ exportDatasetToDuckdb(
 )
 }
 \arguments{
-\item{writePrefix}{}
+\item{path}{Path to export the dataset and create the duckdb database.}
+
+\item{datasetName}{Name of the dataset. See \code{availableDatasets()} for
+possibilities.}
+
+\item{cdmSchema}{A string that indicates the cdm schema.}
+
+\item{cdmPrefix}{A string that prefixes the tables in the cdm schema.}
+
+\item{writeSchema}{A string that indicates the write schema.}
+
+\item{writePrefix}{A string that prefixes the tables in the write schema.}
+}
+\value{
+The path of the created files.
 }
 \description{
-Title
+This will create a permanent duckdb database where you can work locally and
+connect and disconnect using \code{CDMConnector}.
+}
+\examples{
+library(OmopDatasets)
+
+datasetsFolder(tempdir())
+downloadDataset(datasetName = "GiBleed")
+
+pathToExport <- file.path(tempdir(), "myDatabase")
+dir.create(pathToExport)
+
+exportDatasetToDuckdb(path = pathToExport, datasetName = "GiBleed")
+list.files(pathToExport)
+
 }

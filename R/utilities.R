@@ -50,10 +50,13 @@ downloadDataset <- function(datasetName = "GiBleed",
   if (dir.exists(datasetPath)) {
     if (file.exists(datasetFile)) {
       if (overwrite) {
-        unlink(datasetPath, recursive = TRUE)
+        file.remove(datasetFile)
       } else {
-        if (question("Do you want to overwrite prior existing dataset?")) {
-          unlink(datasetPath, recursive = TRUE)
+        if (rlang::is_interactive()) {
+          cli::cli_inform(c(i = "Set `overwrite = TRUE` to silence this message."))
+        }
+        if (question("Do you want to overwrite prior existing dataset? Y/n")) {
+          file.remove(datasetFile)
         } else {
           return(invisible(datasetPath))
         }
@@ -156,6 +159,7 @@ datasetsFolder <- function(path = NULL) {
       arg <- rlang::set_names(x = tempOmopDatasetsFolder, nm = omopDatasetsKey)
       do.call(what = Sys.setenv, args = as.list(arg))
     }
+    return(Sys.getenv(omopDatasetsKey))
   } else {
     omopgenerics::assertCharacter(x = path, length = 1)
     if (!dir.exists(path)) {
@@ -167,8 +171,8 @@ datasetsFolder <- function(path = NULL) {
     c("i" = "If you want to create a permanent `{omopDatasetsKey}` write the following in your `.Renviron` file:",
       "", " " = "{.pkg {omopDatasetsKey}}=\"{path}\"", "") |>
       cli::cli_inform()
+    return(invisible(Sys.getenv(omopDatasetsKey)))
   }
-  return(Sys.getenv(omopDatasetsKey))
 }
 
 question <- function(message) {
