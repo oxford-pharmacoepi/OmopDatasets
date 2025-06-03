@@ -4,25 +4,11 @@
 \alias{cdmFromDataset}
 \title{Create a \code{duckdb} cdm_reference from a dataset.}
 \usage{
-cdmFromDataset(
-  datasetName = "GiBleed",
-  cdmSchema = "main",
-  cdmPrefix = "",
-  writeSchema = "main",
-  writePrefix = ""
-)
+cdmFromDataset(datasetName = "GiBleed")
 }
 \arguments{
 \item{datasetName}{Name of the dataset. See \code{availableDatasets()} for
 possibilities.}
-
-\item{cdmSchema}{A string that indicates the cdm schema.}
-
-\item{cdmPrefix}{A string that prefixes the tables in the cdm schema.}
-
-\item{writeSchema}{A string that indicates the write schema.}
-
-\item{writePrefix}{A string that prefixes the tables in the write schema.}
 }
 \value{
 A cdm_reference object.

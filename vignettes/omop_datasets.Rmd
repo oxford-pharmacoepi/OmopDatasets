@@ -1,0 +1,134 @@
+---
+title: "Manage sample OMOP CDM Datasets"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{omop_datasets}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Set up
+
+The package **OmopDatasets** allows you to manage a total of **`r length(OmopDatasets::availableDatasets())`** different OMOP CDM sample datasets:
+
+```{r}
+library(OmopDatasets)
+availableDatasets()
+```
+
+These datasets are downloaded by default to temporary library which means they will only be available during the duration of the session and won't be available afterwards. 
+
+```{r}
+datasetsFolder()
+```
+
+
+You can set the folder where datasets are stored using the `datasetsFolder()` function, but this will also only be *temporary* and for the current R session.
+
+```{r}
+datasetsFolder(file.path(tempdir(), "FOLDER_WITH_DATASETS"))
+```
+
+So we would recommend that the first thing you must do is to create a folder where you want to store the OMOP CDM sample datasets and save it in the .Renviron for a *permanent* location. 
+
+1. Create a folder where you want to store the datasets. It does not have to be nested inside your project.
+
+2. Open the .Renviron file (`usethis::edit_r_environ()`) and save your location:
+
+```
+OMOP_DATASETS_FOLDER="path/to/my/folder"
+```
+
+3. Restart your R session.
+
+4. Check that the process worked, if so you should be able to see:
+
+```{r, echo=FALSE}
+Sys.setenv("OMOP_DATASETS_FOLDER" = "path/to/my/folder")
+```
+
+```{r}
+datasetsFolder()
+```
+
+```{r, echo=FALSE, message=FALSE}
+datasetsFolder(file.path(tempdir(), "FOLDER_WITH_DATASETS"))
+```
+
+## Download dataset
+
+You can easily check if a dataset is downloaded using the utility function `isDatasetDownloaded()`, for example in this case we can see that *GiBleed* dataset is not download:
+
+```{r}
+isDatasetDownloaded(datasetName = "GiBleed")
+```
+
+You can download one of the OMOP CDM sample datasets with:
+
+```{r}
+downloadDataset(datasetName = "GiBleed")
+```
+
+Then you can now check that the database was successfully downloaded:
+
+```{r}
+isDatasetDownloaded(datasetName = "GiBleed")
+```
+
+If you want to overwrite the dataset you can download it again with the `overwrite = TRUE` parameter:
+
+```{r}
+downloadDataset(datasetName = "GiBleed", overwrite = TRUE)
+```
+
+You can check which are the downloaded datasets with `datasetStatus()` in this case we will see that *GiBleed* is the only one that has been downloaded:
+
+```{r}
+datasetStatus()
+```
+
+## Create a cdm reference
+
+You can create *temporary* cdm_reference objects with the `cdmFromDataset()` function, this function will create a temporary *duckdb* database in duckdb with two schemas **main** (cdmSchema) and **results** (writeSchema). 
+
+```{r}
+cdm <- cdmFromDataset(datasetName = "GiBleed")
+cdm
+```
+
+This function is intended for temporary use of those databases as any modification to this database will disappear after you close the connection to the cdm. If you want to export a database that you want to use please use `exportDatasetToDuckdb()`.
+
+## Export a dataset
+
+You can export the dataset and create a duckdb connection using the `exportDatasetToDuckdb()` function.
+
+```{r}
+path <- file.path(tempdir(), "my_db")
+dir.create(path)
+exportDatasetToDuckdb(path = path, datasetName = "GiBleed")
+```
+
+Note that the exported `.duckdb` file has an associated METADATA file with the export datails:
+
+```{r, echo=FALSE}
+readLines(file.path(tempdir(), "my_db", "METADATA")) |> 
+  cat(sep = "\n")
+```
+
+Once you have exported your dataset you can connect using the usual *CDMConnector* function and it works as any other database:
+
+```{r}
+library(CDMConnector)
+library(duckdb)
+
+con <- dbConnect(drv = duckdb(dbdir = file.path(path, "GiBleed.duckdb")))
+cdm <- cdmFromCon(con = con, cdmSchema = "main", writeSchema = "results", cdmName = "GiBleed")
+cdm
+```

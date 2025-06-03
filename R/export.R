@@ -6,7 +6,6 @@
 #' `exportDatasetToDuckdb()`.
 #'
 #' @inheritParams datasetNameDoc
-#' @inheritParams schemasDoc
 #'
 #' @return A cdm_reference object.
 #' @export
@@ -19,20 +18,12 @@
 #' cdm <- cdmFromDataset(datasetName = "GiBleed")
 #' cdm
 #'
-cdmFromDataset <- function(datasetName = "GiBleed",
-                           cdmSchema = "main",
-                           cdmPrefix = "",
-                           writeSchema = "main",
-                           writePrefix = "") {
+cdmFromDataset <- function(datasetName = "GiBleed") {
   rlang::check_installed("duckdb")
   rlang::check_installed("CDMConnector")
 
   # initial check
   datasetName <- validateDatasetName(datasetName)
-  omopgenerics::assertCharacter(cdmSchema, length = 1)
-  omopgenerics::assertCharacter(cdmPrefix, length = 1)
-  omopgenerics::assertCharacter(writeSchema, length = 1)
-  omopgenerics::assertCharacter(writePrefix, length = 1)
 
   # make dataset avialable
   datasetPath <- dirname(datasetAvailable(datasetName))
@@ -41,10 +32,8 @@ cdmFromDataset <- function(datasetName = "GiBleed",
   files <- exportDatasetToDuckdb(
     path = datasetPath,
     datasetName = datasetName,
-    cdmSchema = cdmSchema,
-    cdmPrefix = cdmPrefix,
-    writeSchema = writeSchema,
-    writePrefix = writePrefix
+    cdmSchema = "main",
+    writeSchema = "results"
   )
 
   # metadata
@@ -52,15 +41,12 @@ cdmFromDataset <- function(datasetName = "GiBleed",
 
   # create cdm object
   con <- duckdb::dbConnect(drv = duckdb::duckdb(dbdir = metadata$dbDir))
-  wp <- metadata$writePrefix
-  if (wp == "") wp <- NULL
   CDMConnector::cdmFromCon(
     con = con,
     cdmSchema = metadata$cdmSchema,
     writeSchema = metadata$writeSchema,
     cdmVersion = metadata$cdmVersion,
-    cdmName = metadata$cdmName,
-    writePrefix = wp
+    cdmName = metadata$cdmName
   )
 }
 
@@ -185,18 +171,14 @@ exportDatasetToFiles <- function(path,
 exportDatasetToDuckdb <- function(path,
                                   datasetName = "GiBleed",
                                   cdmSchema = "main",
-                                  cdmPrefix = "",
-                                  writeSchema = "main",
-                                  writePrefix = "") {
+                                  writeSchema = "results") {
   rlang::check_installed("duckdb")
 
   # initial checks
   path <- validatePath(path)
   datasetName <- validateDatasetName(datasetName)
   omopgenerics::assertCharacter(cdmSchema, length = 1)
-  omopgenerics::assertCharacter(cdmPrefix, length = 1)
   omopgenerics::assertCharacter(writeSchema, length = 1)
-  omopgenerics::assertCharacter(writePrefix, length = 1)
 
   # check dataset availability
   datasetPath <- datasetAvailable(datasetName)
@@ -213,9 +195,7 @@ exportDatasetToDuckdb <- function(path,
     cdmName = nm,
     cdmVersion = vr,
     cdmSchema = cdmSchema,
-    cdmPrefix = cdmPrefix,
-    writeSchema = writeSchema,
-    writePrefix = writePrefix
+    writeSchema = writeSchema
   )
   metadataFile <- file.path(path, "METADATA")
   if (file.exists(metadataFile)) {
@@ -249,7 +229,7 @@ exportDatasetToDuckdb <- function(path,
     purrr::keep(\(x) endsWith(x = x, suffix = ".parquet")) |>
     purrr::map(\(x) {
       nm <- substr(basename(x), 1, nchar(basename(x)) - 8)
-      sql <- "CREATE TABLE {cdmSchema}.{cdmPrefix}{nm} AS SELECT * FROM read_parquet('{x}')" |>
+      sql <- "CREATE TABLE {cdmSchema}.{nm} AS SELECT * FROM read_parquet('{x}')" |>
         glue::glue()
       DBI::dbExecute(conn = con, statement = sql)
     }) |>
@@ -313,15 +293,12 @@ cdmFromMetadata <- function(path) {
     rlang::check_installed("duckdb")
     rlang::check_installed("CDMConnector")
     con <- duckdb::dbConnect(drv = duckdb::duckdb(dbdir = metadata$dbDir))
-    wp <- metadata$writePrefix
-    if (wp == "") wp <- NULL
     cdm <- CDMConnector::cdmFromCon(
       con = con,
       cdmSchema = metadata$cdmSchema,
       writeSchema = metadata$writeSchema,
       cdmVersion = metadata$cdmVersion,
-      cdmName = metadata$cdmName,
-      writePrefix = wp
+      cdmName = metadata$cdmName
     )
   } else {
     cli::cli_abort(c(x = "`METADATA` file is not properly formated."))

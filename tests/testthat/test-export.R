@@ -8,16 +8,7 @@ test_that("test export functions", {
   expect_no_error(cdm <- cdmFromDataset(datasetName = dbName))
   expect_no_error(omopgenerics::validateCdmArgument(cdm))
 
-  expect_no_error(cdm <- cdmFromDataset(
-    datasetName = dbName, cdmSchema = "test", writeSchema = "results",
-    writePrefix = "mc_"
-  ))
-  expect_no_error(src <- omopgenerics::cdmSource(cdm))
-  expect_true("db_cdm" %in% class(src))
-  expect_identical(attr(src, "write_schema"), c(schema = "results", prefix = "mc_"))
-  schemas <- dplyr::tbl(CDMConnector::cdmCon(cdm), I("information_schema.schemata")) |>
-    dplyr::collect()
-  expect_true(all(c("results", "test") %in% schemas$schema_name))
+  expect_no_error(cdm <- cdmFromDataset(datasetName = dbName))
 
   tdf <- file.path(tempdir(), "export")
   dir.create(tdf, showWarnings = FALSE)
@@ -28,13 +19,21 @@ test_that("test export functions", {
   expect_identical(md$type, "files")
   expect_identical(md$format, "csv")
 
-  tdd <- file.path(tempdir(), "export_db")
-  dir.create(tdd, showWarnings = FALSE)
-  expect_no_error(exportDatasetToDuckdb(path = tdd, datasetName = dbName))
-
   expect_no_error(cdm <- cdmFromMetadata(path = tdf))
   expect_no_error(omopgenerics::validateCdmArgument(cdm))
+
+  tdd <- file.path(tempdir(), "export_db")
+  dir.create(tdd, showWarnings = FALSE)
+  expect_no_error(exportDatasetToDuckdb(path = tdd, datasetName = dbName, cdmSchema = "test", writeSchema = "results"))
+
   expect_no_error(cdm <- cdmFromMetadata(path = tdd))
   expect_no_error(omopgenerics::validateCdmArgument(cdm))
+
+  expect_no_error(src <- omopgenerics::cdmSource(cdm))
+  expect_true("db_cdm" %in% class(src))
+  expect_identical(attr(src, "write_schema"), c(schema = "results"))
+  schemas <- dplyr::tbl(CDMConnector::cdmCon(cdm), I("information_schema.schemata")) |>
+    dplyr::collect()
+  expect_true(all(c("results", "test") %in% schemas$schema_name))
 
 })

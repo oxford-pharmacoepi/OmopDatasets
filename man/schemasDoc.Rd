@@ -6,11 +6,7 @@
 \arguments{
 \item{cdmSchema}{A string that indicates the cdm schema.}
 
-\item{cdmPrefix}{A string that prefixes the tables in the cdm schema.}
-
 \item{writeSchema}{A string that indicates the write schema.}
-
-\item{writePrefix}{A string that prefixes the tables in the write schema.}
 }
 \description{
 Helper for consistent documentation of \code{schemas}.

@@ -8,9 +8,7 @@ exportDatasetToDuckdb(
   path,
   datasetName = "GiBleed",
   cdmSchema = "main",
-  cdmPrefix = "",
-  writeSchema = "main",
-  writePrefix = ""
+  writeSchema = "results"
 )
 }
 \arguments{
@@ -21,11 +19,7 @@ possibilities.}
 
 \item{cdmSchema}{A string that indicates the cdm schema.}
 
-\item{cdmPrefix}{A string that prefixes the tables in the cdm schema.}
-
 \item{writeSchema}{A string that indicates the write schema.}
-
-\item{writePrefix}{A string that prefixes the tables in the write schema.}
 }
 \value{
 The path of the created files.
