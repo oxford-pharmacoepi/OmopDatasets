@@ -5,6 +5,8 @@
 <url><loc>https://oxford-pharmacoepi.github.io/OmopDatasets/index.html</loc></url>
 <url><loc>https://oxford-pharmacoepi.github.io/OmopDatasets/reference/OmopDatasets-package.html</loc></url>
 <url><loc>https://oxford-pharmacoepi.github.io/OmopDatasets/reference/availableDatasets.html</loc></url>
+<url><loc>https://oxford-pharmacoepi.github.io/OmopDatasets/reference/cdmFromDataset.html</loc></url>
+<url><loc>https://oxford-pharmacoepi.github.io/OmopDatasets/reference/cdmFromMetadata.html</loc></url>
 <url><loc>https://oxford-pharmacoepi.github.io/OmopDatasets/reference/datasetNameDoc.html</loc></url>
 <url><loc>https://oxford-pharmacoepi.github.io/OmopDatasets/reference/datasetStatus.html</loc></url>
 <url><loc>https://oxford-pharmacoepi.github.io/OmopDatasets/reference/datasetsFolder.html</loc></url>
