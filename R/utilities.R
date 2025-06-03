@@ -45,7 +45,7 @@ downloadDataset <- function(datasetName = "GiBleed",
   omopgenerics::assertLogical(overwrite, length = TRUE)
 
   datasetPath <- file.path(path, datasetName)
-  datasetFile <- file.path(datasetPath, paste0(datasetPath, ".zip"))
+  datasetFile <- file.path(datasetPath, paste0(datasetName, ".zip"))
   # is available
   if (dir.exists(datasetPath)) {
     if (file.exists(datasetFile)) {
@@ -180,6 +180,7 @@ question <- function(message) {
       x[x == "y"] <- "yes"
       x[x == "n"] <- "no"
     }
+    x == "yes"
   } else {
     TRUE
   }
